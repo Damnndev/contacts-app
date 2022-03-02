@@ -1,17 +1,11 @@
 <?php
-  $contacts = [
-    ["name" => "María", "phone_number" => "6432221234"],
-    ["name" => "Jesús", "phone_number" => "6322121234"],
-    ["name" => "Damián", "phone_number" => "689224214"],
-    ["name" => "Amparo", "phone_number" => "9882221234"],
-    ["name" => "Bea", "phone_number" => "6322121234"],
-    ["name" => "Iván", "phone_number" => "679284214"],
-  ]
+  require "database.php";
+
+  $contacts = $conn->query("SELECT * FROM contacts");
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -27,6 +21,7 @@
     <link rel="stylesheet" href="./static/css/index.css">
   <title>Contacts App</title>
 </head>
+
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
@@ -44,7 +39,7 @@
             <a class="nav-link" href="#">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="./add.html">Add Contact</a>
+            <a class="nav-link" href="./add.php">Add Contact</a>
           </li>
         </ul>
       </div>
@@ -54,6 +49,14 @@
   <main>
     <div class="container pt-4 p-3">
       <div class="row">
+        <?php if($contacts->rowCount() == 0): ?>
+          <div class="col-md-4 mx-auto">
+            <div class="card card-body text-center">
+              <p>No contacts saved yet</p>
+              <a href="./add.php">Add One!</a>
+            </div>
+          </div>
+        <?php endif ?>
         <?php foreach($contacts as $contact): ?>
           <div class="col-md-4 mb-3">
             <div class="card text-center">
