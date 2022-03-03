@@ -2,9 +2,11 @@
 
   require "database.php";
 
-   if(!isset($_SESSION["user"])) {
-    header("Location: login.php");
-    return;
+  session_start();
+
+  if(!isset($_SESSION["user"])) {
+  header("Location: login.php");
+  return;
   }
 
   $id = $_GET["id"];
@@ -19,6 +21,12 @@
   }
 
   $contact = $statement->fetch(PDO::FETCH_ASSOC);
+
+  if($contact["user_id"] !== $_SESSION["user"]["id"]) {
+    http_response_code(403);
+    echo("HTTP 403 UNAUTHORIZED");
+    return;
+  }
 
   $error = null;
 
@@ -44,7 +52,10 @@
         ":phone_number" => $_POST["phone_number"]
       ]);
 
+      $_SESSION["flash"] = ["message" => "Contact {$_POST["name"]} updated."];
+
       header("Location: home.php");
+      return;
 
     }
   }
