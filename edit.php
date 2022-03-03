@@ -7,6 +7,19 @@
     return;
   }
 
+  $id = $_GET["id"];
+
+  $statement = $conn->prepare("SELECT * FROM contacts WHERE id = :id LIMIT 1");
+  $statement->execute([":id" => $id]);
+
+  if($statement->rowCount() == 0){
+    http_response_code(404);
+    echo("HTTP 404 NOT FOUND");
+    return;
+  }
+
+  $contact = $statement->fetch(PDO::FETCH_ASSOC);
+
   $error = null;
 
   if($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -24,10 +37,12 @@
       $name = $_POST["name"];
       $phoneNumber = $_POST["phone_number"];
 
-      $statement = $conn->prepare("INSERT INTO contacts (name, phone_number) VALUES (:name, :phone_number)");
-      $statement->bindParam(":name", $_POST["name"]);
-      $statement->bindParam(":phone_number", $_POST["phone_number"]);
-      $statement->execute();
+      $statement = $conn->prepare("UPDATE contacts SET name = :name, phone_number = :phone_number WHERE id = :id");
+      $statement->execute([
+        ":id" => $id,
+        ":name" => $_POST["name"],
+        ":phone_number" => $_POST["phone_number"]
+      ]);
 
       header("Location: home.php");
 
@@ -48,12 +63,12 @@
                 <?php echo $error ?>
               </p>
             <?php endif ?>
-            <form method="POST" action="add.php">
+            <form method="POST" action="edit.php?id=<?php echo $contact["id"] ?>">
               <div class="mb-3 row">
                 <label for="name" class="col-md-4 col-form-label text-md-end">Name</label>
 
                 <div class="col-md-6">
-                  <input id="name" type="text" class="form-control" name="name" required autocomplete="name" autofocus>
+                  <input value="<?php echo $contact["name"]?>" id="name" type="text" class="form-control" name="name" required autocomplete="name" autofocus>
                 </div>
               </div>
 
@@ -61,7 +76,7 @@
                 <label for="phone_number" class="col-md-4 col-form-label text-md-end">Phone Number</label>
 
                 <div class="col-md-6">
-                  <input id="phone_number" type="tel" class="form-control" name="phone_number" required autocomplete="phone_number" autofocus>
+                  <input value="<?php echo $contact["phone_number"]?>" id="phone_number" type="tel" class="form-control" name="phone_number" required autocomplete="phone_number" autofocus>
                 </div>
               </div>
 

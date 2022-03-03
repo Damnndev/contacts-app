@@ -2,6 +2,11 @@
 
 require "database.php";
 
+ if(!isset($_SESSION["user"])) {
+  header("Location: login.php");
+  return;
+}
+
 $id = $_GET["id"];
 
 $statement = $conn->prepare("SELECT * FROM contacts WHERE id = :id");
@@ -15,6 +20,6 @@ if($statement->rowCount() == 0) {
 
 $conn->prepare("DELETE FROM contacts WHERE id = :id")->execute([":id" => $id]);
 
-header("Location: index.php");
+header("Location: home.php");
 
 ?>
